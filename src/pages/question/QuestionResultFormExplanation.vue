@@ -24,14 +24,29 @@
         <p class="text-md-left font-nanum-gothic-regular"><span class="font-nanum-myeongjo-extrabold">해설 : </span>{{ data.explanation }}</p>
       </div>
 
-      <!-- 저장 및 신고 버튼 -->
-      <div v-if="saveComplete">
-        <button class="btn btn-success" disabled>처리 완료!</button>
+
+      <div class="d-flex align-items-center mt-3">
+        <!-- 저장 및 신고 버튼 -->
+        <div v-if="saveComplete">
+          <button class="btn btn-success" disabled>처리 완료!</button>
+        </div>
+        <div v-else>
+          <button type="button" class="btn btn-primary mx-1" style="background-color: #002c62; border-color: #002c62" @click="postQuestion('/community/question/save')">내 문제집 저장</button>
+          <button type="button" class="btn btn-danger" @click="postQuestion('/community/result/junk')">문제 신고하기</button>
+        </div>
+
+        <!-- 오른쪽 정렬된 버튼 -->
+        <button
+            type="button"
+            class="btn btn-secondary ml-auto"
+            href="/question"
+        >
+          오른쪽 버튼
+        </button>
       </div>
-      <div v-else>
-        <button type="button" class="btn btn-primary mx-1" style="background-color: #002c62; border-color: #002c62" @click="postQuestion('/community/question/save')">내 문제집 저장</button>
-        <button type="button" class="btn btn-danger" @click="postQuestion('/community/result/junk')">문제 신고하기</button>
-      </div>
+
+
+
 
     </div> <!-- /container -->
   </div>
