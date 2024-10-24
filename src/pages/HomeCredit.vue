@@ -2,7 +2,7 @@
   <div class="container-fluid text-center font-nanum-gothic-regular">
     <div>
       <br>
-      <h2 class="nav-item font-nanum-myeongjo-extrabold">소프트웨어융합학과 2024 종합 설계</h2>
+      <h2 class="nav-item font-nanum-gothic-extrabold">소프트웨어융합학과 2024 종합 설계</h2>
       <br>
       <b class="font-nanum-gothic-bold">LLaMA-3 학습 데이터셋 수집 및 튜닝 기간</b>
       <p class="lead">2024.3.2 ~ 2024.10.x</p>
@@ -30,6 +30,9 @@
       <b>김유나</b>
       <p>LLM 모델 학습</p>
     </div>
+    
+    <br>
+    <img class="img-fluid mt-5" alt="판넬" src="/src/constants/종합설계_판넬_resized.jpg">
   </div>
 </template>
 
