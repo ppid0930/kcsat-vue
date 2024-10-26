@@ -32,7 +32,7 @@
     </div>
     
     <br>
-    <img class="img-fluid mt-5" alt="판넬" src="/src/constants/종합설계_판넬_resized.jpg">
+    <img class="img-fluid mt-5" alt="판넬" src="../constants/hpclab-2024-capstone_resized.jpg">
   </div>
 </template>
 
@@ -46,5 +46,5 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 </style>

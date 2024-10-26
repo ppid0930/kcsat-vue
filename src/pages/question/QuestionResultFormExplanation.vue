@@ -25,6 +25,8 @@
       </div>
 
 
+      <br>
+
       <div class="d-flex align-items-center mt-3">
         <!-- 저장 및 신고 버튼 -->
         <div v-if="saveComplete">
@@ -35,14 +37,14 @@
           <button type="button" class="btn btn-danger" @click="postQuestion('/community/result/junk')">문제 신고하기</button>
         </div>
 
-        <!-- 오른쪽 정렬된 버튼 -->
-        <button
-            type="button"
-            class="btn btn-secondary ml-auto"
-            href="/question"
-        >
-          오른쪽 버튼
-        </button>
+        <a href="/question" style="text-decoration: none">
+          <button
+              type="button"
+              class="btn btn-secondary mx-1"
+          >
+            문제 다시 생성하기
+          </button>
+        </a>
       </div>
 
 

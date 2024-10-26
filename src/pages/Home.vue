@@ -8,7 +8,7 @@
       <div class="font-nanum-gothic-regular">
         <h4 class="nav-item font-nanum-myeongjo-extrabold">무료 AI 영어 문제 생성</h4>
         <br>
-        <p>ETA(English Test Agent)는 대학수학능력시험 영어 영역 스타일의 문제를 AI를 이용하여 자동으로 생성하고,</p>
+        <p><span class="font-nanum-gothic-extrabold">ETA(English Test Agent)</span>는 대학수학능력시험 영어 영역 스타일의 문제를 AI를 이용하여 자동으로 생성하고,</p>
         <p>문제에 해당되는 번역과 실질적인 솔루션을 제공해 주는 서비스입니다.</p>
         <p><span class="font-nanum-gothic-extrabold">총 15개 유형</span>의 문제를 제작할 수 있고 문제를 사용자들과 공유함으로써</p>
         <p>영어 실력을 키워나갈 수 있는 커뮤니티입니다.</p>
@@ -33,14 +33,17 @@
       </button>
       <div v-if="loading">
         <div v-if="nowOffset > 0">
-          <p>현재 앞에 <b>{{nowOffset}}</b>명 대기중입니다.</p>
+          <span>현재 앞에 <b>{{nowOffset}}</b>명 대기중입니다.</span>
         </div>
         <div v-else-if="nowOffset === 0">
-          <b style="color: green">문제 생성중입니다!!!!!</b>
+          <span><b style="color: green">문제 생성중입니다!!!!!</b></span>
         </div>
         <div v-else>
-          <p>문제 생성 로딩중.......</p>
+          <span>문제 생성 로딩중.......</span>
         </div>
+      </div>
+      <div v-else>
+        <br>
       </div>
     </div>
   </div>
@@ -48,12 +51,13 @@
 
 <script>
 import api from "@/api.js"
-import {onUnmounted, ref} from 'vue';
+import {computed, onUnmounted, ref} from 'vue';
 import { useRouter } from 'vue-router';
 import {useQuestionStorage} from "@/piniaStorage/questionStorage.js";
 
 export default {
   setup() {
+    const isAuthenticated = computed(() => !!localStorage.getItem("jwt"));
     const router = useRouter();
     const loading = ref(false);
     const questionStorage = useQuestionStorage();
@@ -117,10 +121,17 @@ export default {
           answer: response.data.answer,
         });
 
-        // 요청 성공 시 페이지 이동
-        await router.replace({
-          path: '/question/demo/result'
-        });
+        if (isAuthenticated.value) {
+          await router.replace({
+            path: '/question/result'
+          });
+        } else {
+          await router.replace({
+            path: '/question/demo/result'
+          });
+        }
+
+
       } catch (error) {
         console.log(error);
         stopNowOffsetLoop();

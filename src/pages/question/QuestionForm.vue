@@ -43,14 +43,17 @@
       </div>
       <div v-if="loading">
         <div v-if="nowOffset > 0">
-          <p>현재 앞에 {{nowOffset}}명 대기중입니다.</p>
+          <span>현재 앞에 {{nowOffset}}명 대기중입니다.</span>
         </div>
         <div v-else-if="nowOffset <= 0">
-          <b style="color: green">문제 생성중입니다!!!!!</b>
+          <span><b style="color: green">문제 생성중입니다!!!!!</b></span>
         </div>
         <div v-else>
-          <p>문제 생성 로딩중.......</p>
+          <span>문제 생성 로딩중.......</span>
         </div>
+      </div>
+      <div v-else>
+        <br>
       </div>
     </div>
   </div>

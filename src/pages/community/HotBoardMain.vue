@@ -257,4 +257,5 @@ export default {
   border-radius: 10px; /* 테이블 모서리 곡선 */
   overflow: hidden; /* 둥근 모서리에서 테두리가 넘치지 않게 */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
-}</style>
+}
+</style>

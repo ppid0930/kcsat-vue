@@ -26,12 +26,12 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .min-vh-85 {
   min-height: 85vh; /* 화면 높이의 80% */
 }
 .custom-container {
-  border: 1.5px solid #ddd; /* 테두리 색상 */
+  border: 2px solid #ddd; /* 테두리 색상 */
   border-radius: 20px; /* 곡선 정도 */
   padding: 50px; /* 내부 여백 */
   background-color: #f2f2f2; /* 배경 색상 */

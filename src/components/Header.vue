@@ -1,6 +1,6 @@
 <template>
-  <div class="bg-light" style="border-bottom: 1px solid #ddd;">
-    <div class="navbar navbar-light sticky-top">
+  <div class="bg-light sticky-top" style="border-bottom: 1px solid #ddd;">
+    <div class="navbar navbar-light">
       <!-- 로고 이미지와 제목 -->
       <a href="/" style="color:#002c62; text-decoration: none">
         <div class="d-flex justify-content-between align-items-center">
