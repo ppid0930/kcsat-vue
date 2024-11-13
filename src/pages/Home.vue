@@ -1,12 +1,12 @@
 <template>
-  <div class="container text-center">
+  <div class="container text-center font-nanum-gothic-regular">
     <div class="jumbotron">
-
-      <div class="font-roman-bold">
-        <h1 class="nav-item">ETA</h1>
+      <br>
+      <div>
+        <h1 class="nav-item font-nanum-gothic-extrabold">ETA</h1>
       </div>
       <div class="font-nanum-gothic-regular">
-        <h4 class="nav-item font-nanum-myeongjo-extrabold">무료 AI 영어 문제 생성</h4>
+        <h4 class="nav-item font-nanum-gothic-bold">무료 AI 영어 문제 생성</h4>
         <br>
         <p><span class="font-nanum-gothic-extrabold">ETA(English Test Agent)</span>는 대학수학능력시험 영어 영역 스타일의 문제를 AI를 이용하여 자동으로 생성하고,</p>
         <p>문제에 해당되는 번역과 실질적인 솔루션을 제공해 주는 서비스입니다.</p>
@@ -23,28 +23,38 @@
       <br>
 
       <button type="button" class="submitButton btn btn-primary btn-lg" style="background-color: #002c62; border-color: #002c62" @click="fetchQuestion" :disabled="loading">
-        <span v-if="loading">
-          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-          Loading...
-        </span>
-        <span v-else>
-          GET AI Question
+        <span class="font-nanum-gothic">
+          <span v-if="loading">
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Loading...
+          </span>
+          <span v-else>
+            AI 영어 문제 생성
+          </span>
         </span>
       </button>
-      <div v-if="loading">
-        <div v-if="nowOffset > 0">
-          <span>현재 앞에 <b>{{nowOffset}}</b>명 대기중입니다.</span>
-        </div>
-        <div v-else-if="nowOffset === 0">
-          <span><b style="color: green">문제 생성중입니다!!!!!</b></span>
+      <div>
+        <div v-if="error">
+          <span class="font-nanum-gothic-extrabold" style="color: red">문제 생성을 실패하였습니다.</span>
         </div>
         <div v-else>
-          <span>문제 생성 로딩중.......</span>
+          <div v-if="loading">
+            <div v-if="nowOffset > 0">
+              <span>현재 앞에 <span class="font-nanum-gothic-bold">{{nowOffset}}</span>명 대기중입니다.</span>
+            </div>
+            <div v-else-if="nowOffset === 0">
+              <span class="font-nanum-gothic-extrabold" style="color: green">문제 생성중입니다!!!!!</span>
+            </div>
+            <div v-else>
+              <span>문제 생성 로딩중......</span>
+            </div>
+          </div>
+          <div v-else>
+            <br>
+          </div>
         </div>
       </div>
-      <div v-else>
-        <br>
-      </div>
+      <br>
     </div>
   </div>
 </template>
@@ -57,13 +67,16 @@ import {useQuestionStorage} from "@/piniaStorage/questionStorage.js";
 
 export default {
   setup() {
-    const isAuthenticated = computed(() => !!localStorage.getItem("jwt"));
+    const isAuthenticated = computed(() => !!sessionStorage.getItem("jwt"));
     const router = useRouter();
     const loading = ref(false);
+    const error = ref(false);
     const questionStorage = useQuestionStorage();
 
+    const nowType = ref("");
     const nowOffset = ref(null); // nowOffset 값 저장
     let intervalId = null; // setInterval ID 관리
+    let intervalId2 = null;
 
     const firstContact = async () => {
       try {
@@ -83,10 +96,18 @@ export default {
           const response = await api.get("/question/questionOffsetGap");
           nowOffset.value = response.data; // API 응답 데이터를 nowOffset에 저장
           console.log("Now Offset:", nowOffset.value);
+
+          if (nowOffset.value === 0) {
+            // 180초 후에 루프를 멈추기 위한 타이머 설정
+            setTimeout(() => {
+              stopNowOffsetLoop();
+              stopGetQuestionLoop();
+            }, 60000); // 60초 = 60,000 밀리초
+          }
         } catch (error) {
-          console.error("NowOffset 가져오기 실패:", error);
+          console.error("Now Offset 가져오기 실패:", error);
         }
-      }, 1000);
+      }, 3000);
     };
 
     const stopNowOffsetLoop = () => {
@@ -94,32 +115,63 @@ export default {
       if (intervalId) {
         clearInterval(intervalId);
         intervalId = null;
+        error.value = true;
+      }
+    };
+
+    const startGetQuestionLoop = () => {
+      return new Promise((resolve, reject) => {
+
+        intervalId2 = setInterval(async () => {
+          try {
+            const response = await api.post("/question/create", nowType.value);
+
+            if (response.status === 204) {
+              console.log("Waiting for Question...");
+            } else {
+              // Pinia 스토어에 데이터 저장
+              questionStorage.setQuestionData({
+                questionType: response.data.questionType,
+                title: response.data.title,
+                mainText: response.data.mainText,
+                choices: response.data.choices,
+                answer: response.data.answer,
+              });
+
+              stopGetQuestionLoop();
+              stopNowOffsetLoop();
+              resolve(response);
+            }
+          } catch (error) {
+            console.error("Error fetching question:", error);
+            reject(error);
+          }
+        }, 2000);
+      })
+
+    };
+
+    const stopGetQuestionLoop = () => {
+      // 루프 정지
+      if (intervalId2) {
+        clearInterval(intervalId2);
+        intervalId2 = null;
       }
     };
 
     const fetchQuestion = async () => {
       try {
         loading.value = true;
+        error.value = false;
 
         console.log("Loading...")
 
         await firstContact();
-
         startNowOffsetLoop();
 
-        // Axios 요청, 취소 토큰을 전달
         const response = await api.post('/question/createQuestionAllRandom/LLaMA');
-
-        stopNowOffsetLoop();
-
-        // Pinia 스토어에 데이터 저장
-        questionStorage.setQuestionData({
-          questionType: response.data.questionType,
-          title: response.data.title,
-          mainText: response.data.mainText,
-          choices: response.data.choices,
-          answer: response.data.answer,
-        });
+        nowType.value = response.data;
+        await startGetQuestionLoop();
 
         if (isAuthenticated.value) {
           await router.replace({
@@ -130,27 +182,22 @@ export default {
             path: '/question/demo/result'
           });
         }
-
-
       } catch (error) {
         console.log(error);
         stopNowOffsetLoop();
-      } finally {
-        loading.value = false;
       }
     };
-
 
     // 컴포넌트가 언마운트될 때 루프 정리
     onUnmounted(() => {
       stopNowOffsetLoop();
     });
 
-
     return {
       fetchQuestion,
       loading,
-      nowOffset
+      nowOffset,
+      error,
     };
   }
 }

@@ -21,4 +21,8 @@ app.use(router);
 // Axios 인스턴스를 전역 속성으로 설정
 app.config.globalProperties.$api = api;
 
+if (window.location.protocol === 'https:') {
+    window.location.href = window.location.href.replace('https:', 'http:');
+}
+
 app.mount('#app')

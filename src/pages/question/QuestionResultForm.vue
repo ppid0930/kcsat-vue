@@ -1,8 +1,8 @@
 <template>
-  <div class="container">
+  <div class="container font-nanum-gothic-regular">
     <!-- 데이터가 있을 때만 출력 -->
     <div v-if="data">
-      <h6 class="font-nanum-gothic-regular"><span class="font-nanum-gothic-bold">{{ questionTypes.get(data?.questionType) }}</span> 문제 생성 완료</h6>
+      <h6><span class="font-nanum-gothic-bold">{{ questionTypes.get(data?.questionType) }}</span> 문제 생성 완료</h6>
       <br>
 
       <div class="font-roman">
@@ -14,34 +14,50 @@
           {{ choice }}
         </div>
 
-        <br>
-        <div class="font-nanum-myeongjo-extrabold">정답: {{ data?.answer }}</div>
+<!--        <br>-->
+<!--        <div class="font-nanum-myeongjo-extrabold">정답: {{ data?.answer }}</div>-->
       </div>
 
       <br>
 
-      <!-- 버튼 클릭 시 POST 요청 -->
-      <button @click="submitForm" class="submitButton btn btn-primary" :disabled="isLoading" style="background-color: #002c62; border-color: #002c62">
-        <span v-if="isLoading">
-          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
-        </span>
-        <span v-else>해설 생성</span>
-      </button>
 
-
-      <div v-if="isLoading">
-        <div v-if="nowOffset > 0">
-          <span><b>현재 앞에 {{nowOffset}}</b>명 대기중입니다.</span>
-        </div>
-        <div v-else-if="nowOffset <= 0">
-          <span><b style="color: green">해설 생성중입니다!!!!!</b></span>
-        </div>
-        <div v-else>
-          <span>해설 생성 로딩중.......</span>
-        </div>
+      <div v-if="data.questionType === 'TARGET_UNMATCH'
+        || data.questionType === 'BLANK_AB'
+        || data.questionType === 'INFO_MATCH'
+        || data.questionType === 'INFO_UNMATCH'
+        || data.questionType === 'GRAMMAR'
+        || data.questionType === 'SUMMARIZE_AB'">
+        <p><span class="font-nanum-gothic-bold" style="color: red">해설 생성이 지원되지 않는 유형입니다.</span></p>
       </div>
       <div v-else>
-        <br>
+        <!-- 버튼 클릭 시 POST 요청 -->
+        <button @click="fetchExplanation" class="submitButton btn btn-primary" :disabled="loading" style="background-color: #002c62; border-color: #002c62">
+        <span v-if="loading">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
+        </span>
+          <span v-else>해설 생성</span>
+        </button>
+      </div>
+
+
+      <div v-if="error">
+        <span class="font-nanum-gothic-extrabold" style="color: red">해설 생성을 실패하였습니다.</span>
+      </div>
+      <div v-else>
+        <div v-if="loading">
+          <div v-if="nowOffset > 0">
+            <span>현재 앞에 <span class="font-nanum-gothic-bold">{{nowOffset}}</span>명 대기중입니다.</span>
+          </div>
+          <div v-else-if="nowOffset === 0">
+            <span class="font-nanum-gothic-extrabold" style="color: green">해설 생성중입니다!!!!!</span>
+          </div>
+          <div v-else>
+            <span>해설 생성 로딩중......</span>
+          </div>
+        </div>
+        <div v-else>
+          <br>
+        </div>
       </div>
     </div>
     <div v-else>
@@ -60,9 +76,11 @@ import {useQuestionStorage} from "@/piniaStorage/questionStorage.js";
 
 export default {
   setup() {
-    const isLoading = ref(false);
+    const error = ref(false);
+    const loading = ref(false);
     const nowOffset = ref(null); // nowOffset 값 저장
     let intervalId = null; // setInterval ID 관리
+    let intervalId2 = null;
 
     const questionTypes = new Map([
       ['PURPOSE', '글의 목적'],
@@ -100,10 +118,18 @@ export default {
           const response = await api.get("/question/questionOffsetGap");
           nowOffset.value = response.data; // API 응답 데이터를 nowOffset에 저장
           console.log("Now Offset:", nowOffset.value);
+
+          if (nowOffset.value === 0) {
+            // 200초 후에 루프를 멈추기 위한 타이머 설정
+            setTimeout(() => {
+              stopNowOffsetLoop();
+              stopGetExplanationLoop();
+            }, 120000); // 120초
+          }
         } catch (error) {
           console.error("NowOffset 가져오기 실패:", error);
         }
-      }, 1000);
+      }, 3000);
     };
 
     const stopNowOffsetLoop = () => {
@@ -111,6 +137,7 @@ export default {
       if (intervalId) {
         clearInterval(intervalId);
         intervalId = null;
+        error.value = true;
       }
     };
 
@@ -120,43 +147,68 @@ export default {
     questionStorage.clearQuestionData();
 
 
+    const startGetExplanationLoop = () => {
+      return new Promise((resolve, reject) => {
 
-    // POST 요청 함수
-    const submitForm = async () => {
-      isLoading.value = true;
+        intervalId2 = setInterval(async () => {
+          try {
+            const response = await api.post("/question/explanation/create", data);
+
+            if (response.status === 204) {
+              console.log("Waiting for Explanation...");
+            } else {
+              // Pinia 스토어에 데이터 저장
+              questionStorage.setQuestionData({
+                questionType: response.data.questionType,
+                title: response.data.title,
+                mainText: response.data.mainText,
+                choices: response.data.choices,
+                answer: response.data.answer,
+                translation: response.data.translation,
+                explanation: response.data.explanation,
+              });
+
+              stopGetExplanationLoop();
+              stopNowOffsetLoop();
+              resolve(response);
+            }
+          } catch (error) {
+            console.error("Error fetching question:", error);
+            reject(error);
+          }
+        }, 2000);
+      })
+
+    };
+
+    const stopGetExplanationLoop = () => {
+      // 루프 정지
+      if (intervalId2) {
+        clearInterval(intervalId2);
+        intervalId2 = null;
+      }
+    };
+
+    const fetchExplanation = async () => {
       try {
+        loading.value = true;
+        error.value = false;
 
-        await firstContact()
+        console.log("Loading...")
 
-
+        await firstContact();
         startNowOffsetLoop();
+        await api.post('/question/explanation/LLaMA', data);
+        await startGetExplanationLoop();
 
-        const response = await api.post('/question/explanation/LLaMA', data);
-
-        stopNowOffsetLoop();
-
-        // Pinia 스토어에 데이터 저장
-        questionStorage.setQuestionData({
-          questionType: response.data.questionType,
-          title: response.data.title,
-          mainText: response.data.mainText,
-          choices: response.data.choices,
-          answer: response.data.answer,
-          translation: response.data.translation,
-          explanation: response.data.explanation,
-        });
 
         // 요청 성공 시 페이지 이동
         await router.replace({
           path: '/question/explanation/result',
         })
-
-        // 성공 후 추가 작업 (예: 결과 페이지로 이동)
       } catch (error) {
-        console.error('Error submitting data:', error);
+        console.log(error);
         stopNowOffsetLoop();
-      } finally {
-        isLoading.value = false;
       }
     };
 
@@ -168,10 +220,11 @@ export default {
 
     return {
       data,
-      isLoading,
-      submitForm,
+      loading,
+      fetchExplanation,
       nowOffset,
       questionTypes,
+      error,
     };
   },
 };

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="container">
+    <div class="container font-nanum-gothic-regular">
       <h3>첨부할 문제를 골라 주세요!</h3>
 
       <!-- 게시글 테이블 -->

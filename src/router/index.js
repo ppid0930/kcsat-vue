@@ -70,11 +70,11 @@ const router = createRouter({
 
 // 네비게이션 가드 설정
 router.beforeEach((to, from, next) => {
-    const jwt = localStorage.getItem('jwt'); // JWT 토큰 확인
+    const jwt = sessionStorage.getItem('jwt'); // JWT 토큰 확인
 
     if (to.meta.requiresAuth) {
         if (jwt === null || isTokenExpired(jwt)) {
-            localStorage.removeItem('jwt');
+            sessionStorage.removeItem('jwt');
             next('/login'); // JWT가 없으면 메인 화면으로 이동
         }
         else {

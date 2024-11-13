@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="container">
+    <div class="container font-nanum-gothic-regular">
       <form @submit.prevent="signIn">
         <div class="form-group">
-          <label class="form-label mt-4">로그인</label>
+          <label class="form-label mt-4 font-nanum-gothic-bold">로그인</label>
 
           <!-- 이메일 입력 -->
           <div class="form-floating mb-3" :class="{ 'has-danger': error }">
@@ -15,7 +15,7 @@
                 id="floatingInput"
                 placeholder="name@example.com"
             />
-            <label for="floatingInput">Email address</label>
+            <label for="floatingInput">이메일 주소</label>
             <div v-if="error" class="invalid-feedback">
               이메일 혹은 비밀번호가 잘못 되었습니다.
             </div>
@@ -30,7 +30,7 @@
                 id="floatingPassword"
                 placeholder="Password"
             />
-            <label for="floatingPassword">Password</label>
+            <label for="floatingPassword">비밀번호</label>
           </div>
         </div>
 
@@ -38,7 +38,7 @@
         <button type="submit" class="btn btn-primary">Log in</button>
         <button
             type="button"
-            class="btn btn-outline-primary"
+            class="btn btn-outline-primary mx-2"
         >
           <router-link to="/signup" style="text-decoration: none">회원 가입</router-link>
         </button>
@@ -70,7 +70,7 @@ export default {
 
         const token = response.data;
 
-        localStorage.setItem('jwt', token);
+        sessionStorage.setItem('jwt', token);
 
         // 페이지를 완전히 새로고침하여 헤더/푸터 포함 모든 것을 리셋
         window.location.href = '/';

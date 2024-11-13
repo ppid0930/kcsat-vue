@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="container">
-      <p class="lead">추천수 20 이상인 글</p>
+    <div class="container font-nanum-gothic-regular">
+      <p class="lead">추천수 20 이상인 글들을 모아 두었습니다.</p>
       <!-- 게시글 테이블 -->
       <div class="table-responsive">
         <table class="table table-striped table-hover custom-table">

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="container">
+    <div class="container font-nanum-gothic-regular">
       <h1 class="mt-4">글 수정</h1>
       <div class="card mb-4">
         <div class="card-body">
@@ -14,7 +14,7 @@
             <!-- 본문 입력 -->
             <div class="mb-3">
               <label for="content" class="form-label">본문</label>
-              <textarea class="form-control" id="content" v-model="content"></textarea>
+              <textarea class="form-control" id="content" v-model="content" rows="10" style="height: 500px"></textarea>
             </div>
 
             <!-- 수정 및 취소 버튼 -->

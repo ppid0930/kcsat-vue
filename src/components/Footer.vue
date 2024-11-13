@@ -1,9 +1,9 @@
 <template>
-  <div class="footer mt-2 mx-4 mb-5">
-    <span class="font-nanum-myeongjo-extrabold">Hongik University 2024 Capstone Design Project</span>
-    <a href="https://hpclab.hongik.ac.kr/?page_id=81" target="_blank" style="margin-left: 50px; color: #002c62;">HPCLab</a>
-    <router-link to="/giveIdea" style="margin-left: 100px;">건의하기</router-link>
-    <router-link to="/credit" style="float: right">Credit</router-link>
+  <div class="footer mt-2 mx-4 mb-5 font-nanum-gothic-regular">
+    <span>Hongik University 2024 Capstone Design Project</span>
+    <a href="https://hpclab.hongik.ac.kr/?page_id=81" target="_blank" style="margin-left: 50px; text-decoration: none">HPCLab</a>
+    <router-link to="/giveIdea" style="margin-left: 100px; text-decoration: none">건의하기</router-link>
+    <router-link to="/credit" style="float: right; text-decoration: none">Credit</router-link>
   </div>
 </template>
 

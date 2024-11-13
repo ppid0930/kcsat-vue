@@ -3,7 +3,7 @@ import router from '@/router';
 
 // Axios 인스턴스를 생성 (필요에 따라 baseURL 설정)
 const api = axios.create({
-    baseURL: 'https://csatmaker.site/api',  // 백엔드 API URL
+    baseURL: 'http://www.csatmaker.site/api',  // 백엔드 API URL
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
@@ -14,7 +14,7 @@ const api = axios.create({
 // Axios 인터셉터 설정
 api.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('jwt');
+        const token = sessionStorage.getItem('jwt');
 
         // 토큰이 있을 경우 Authorization 헤더에 추가
         if (token) {
@@ -31,7 +31,7 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response && error.response.status === 401) {
-            localStorage.removeItem('jwt'); // 유효하지 않은 JWT 제거
+            sessionStorage.removeItem('jwt'); // 유효하지 않은 JWT 제거
             router.push('/'); // 메인 페이지로 이동
         }
         return Promise.reject(error);
@@ -41,7 +41,7 @@ api.interceptors.response.use(
 // 토큰 만료 처리 함수
 function handleTokenExpiration() {
 
-    localStorage.removeItem('jwt');
+    sessionStorage.removeItem('jwt');
 
     // 로그인 페이지로 리다이렉션
     router.push('/login').then(() => {

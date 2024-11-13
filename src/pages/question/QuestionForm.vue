@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="container">
+    <div class="container font-nanum-gothic-regular">
       <!-- 문제 유형 선택 -->
       <div class="form-group">
-        <label for="type">문제 유형 선택</label>
+        <label for="type" class="font-nanum-gothic-bold">문제 유형 선택</label>
         <select v-model="selectedType" id="type" class="form-control">
           <option v-for="questionType in questionTypes" :key="questionType.key" :value="questionType.key">
             {{ questionType.value }}
@@ -15,13 +15,15 @@
 
       <!-- 지문 입력 -->
       <div class="form-group">
-        <label for="mainText">지문 입력</label>
+        <label for="mainText" class="font-nanum-gothic-bold">지문 입력</label>
         <textarea
             v-model="mainText"
             class="form-control"
             id="mainText"
             placeholder="생성하고자 하는 영어 지문을 입력하세요. (지문을 입력하지 않는 경우, 무작위 기출 지문으로 문제가 만들어집니다.)"
             rows="8"
+            minlength="500"
+            maxlength="2000"
         ></textarea>
       </div>
 
@@ -31,7 +33,7 @@
             type="button"
             class="btn btn-primary mx-1"
             :disabled="loading"
-            @click="mainText === '' ? postQuestion('/question/createRandom/LLaMA') : postQuestion('/question/create/LLaMA')"
+            @click="validate_mainText_length"
             style="background-color: #002c62; border-color: #002c62"
         >
           <span v-if="loading">
@@ -41,19 +43,24 @@
           <span v-else>AI 문제 생성</span>
         </button>
       </div>
-      <div v-if="loading">
-        <div v-if="nowOffset > 0">
-          <span>현재 앞에 {{nowOffset}}명 대기중입니다.</span>
-        </div>
-        <div v-else-if="nowOffset <= 0">
-          <span><b style="color: green">문제 생성중입니다!!!!!</b></span>
-        </div>
-        <div v-else>
-          <span>문제 생성 로딩중.......</span>
-        </div>
+      <div v-if="error">
+        <span class="font-nanum-gothic-extrabold" style="color: red">문제 생성을 실패하였습니다.</span>
       </div>
       <div v-else>
-        <br>
+        <div v-if="loading">
+          <div v-if="nowOffset > 0">
+            <span>현재 앞에 <span class="font-nanum-gothic-bold">{{nowOffset}}</span>명 대기중입니다.</span>
+          </div>
+          <div v-else-if="nowOffset === 0">
+            <span class="font-nanum-gothic-extrabold" style="color: green">문제 생성중입니다!!!!!</span>
+          </div>
+          <div v-else>
+            <span>문제 생성 로딩중......</span>
+          </div>
+        </div>
+        <div v-else>
+          <br>
+        </div>
       </div>
     </div>
   </div>
@@ -70,14 +77,17 @@ import { useQuestionStorage } from '@/piniaStorage/questionStorage';
 export default {
   setup() {
     const router = useRouter();
+    const error = ref(false);
     const loading = ref(false);
     const questionStorage = useQuestionStorage();
 
     const selectedType = ref("PURPOSE");
     const mainText = ref("");
 
+    const nowType = ref("");
     const nowOffset = ref(null); // nowOffset 값 저장
     let intervalId = null; // setInterval ID 관리
+    let intervalId2 = null;
 
 
 
@@ -119,10 +129,18 @@ export default {
           const response = await api.get("/question/questionOffsetGap");
           nowOffset.value = response.data; // API 응답 데이터를 nowOffset에 저장
           console.log("Now Offset:", nowOffset.value);
+
+          if (nowOffset.value === 0) {
+            // 180초 후에 루프를 멈추기 위한 타이머 설정
+            setTimeout(() => {
+              stopNowOffsetLoop();
+              stopGetQuestionLoop();
+            }, 60000); // 60초 = 60,000 밀리초
+          }
         } catch (error) {
           console.error("NowOffset 가져오기 실패:", error);
         }
-      }, 1000);
+      }, 3000);
     };
 
     const stopNowOffsetLoop = () => {
@@ -130,39 +148,69 @@ export default {
       if (intervalId) {
         clearInterval(intervalId);
         intervalId = null;
+        error.value = true;
       }
     };
 
+    const startGetQuestionLoop = () => {
+      return new Promise((resolve, reject) => {
 
-    const postQuestion = async (url) => {
+        intervalId2 = setInterval(async () => {
+          try {
+            const response = await api.post("/question/create", nowType.value);
+
+            if (response.status === 204) {
+              console.log("Waiting for Question...");
+            } else {
+              // Pinia 스토어에 데이터 저장
+              questionStorage.setQuestionData({
+                questionType: response.data.questionType,
+                title: response.data.title,
+                mainText: response.data.mainText,
+                choices: response.data.choices,
+                answer: response.data.answer,
+              });
+
+              stopGetQuestionLoop();
+              stopNowOffsetLoop();
+              resolve(response);
+            }
+          } catch (error) {
+            console.error("Error fetching question:", error);
+            reject(error);
+          }
+        }, 2000);
+      })
+
+    };
+
+    const stopGetQuestionLoop = () => {
+      // 루프 정지
+      if (intervalId2) {
+        clearInterval(intervalId2);
+        intervalId2 = null;
+      }
+    };
+
+    const fetchQuestion = async (url) => {
       try {
         loading.value = true;
+        error.value = false;
+
         const payload = {
           type: selectedType.value,
           mainText: mainText.value,
         };
 
-
-        await firstContact()
-
         console.log("Loading...")
 
+        await firstContact();
         startNowOffsetLoop();
 
-        // Axios 요청, 취소 토큰을 전달
         const response = await api.post(url, payload);
+        nowType.value = response.data;
+        await startGetQuestionLoop();
 
-        stopNowOffsetLoop();
-
-
-        // Pinia 스토어에 데이터 저장
-        questionStorage.setQuestionData({
-          questionType: response.data.questionType,
-          title: response.data.title,
-          mainText: response.data.mainText,
-          choices: response.data.choices,
-          answer: response.data.answer,
-        });
 
         // 요청 성공 시 페이지 이동
         await router.replace({path: '/question/result'});
@@ -171,6 +219,21 @@ export default {
         stopNowOffsetLoop();
       }
     };
+
+    const validate_mainText_length = () => {
+      if (mainText.value.length > 0 && mainText.value.length < 500) {
+        alert('글자 수가 너무 적습니다. 500자 이상 입력해주세요.');
+      } else if (mainText.value.length > 2000) {
+        alert('글자 수가 너무 많습니다. 2000자 이하로 입력해주세요.');
+      } else {
+        // 글자 수가 유효한 경우 fetchQuestion 호출
+        const endpoint = mainText.value.length === 0
+            ? '/question/createRandom/LLaMA'
+            : '/question/create/LLaMA';
+        fetchQuestion(endpoint);
+      }
+    }
+
 
     // 컴포넌트가 언마운트될 때 루프 정리
     onUnmounted(() => {
@@ -181,9 +244,10 @@ export default {
       selectedType,
       mainText,
       questionTypes,
-      postQuestion,
+      validate_mainText_length,
       loading,
-      nowOffset
+      nowOffset,
+      error,
     };
   }
 };

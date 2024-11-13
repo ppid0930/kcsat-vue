@@ -1,13 +1,11 @@
 <template>
   <div>
-    <div class="container">
+    <div class="container font-nanum-gothic-regular">
       <!-- 검색 폼 -->
 <!--      <form @submit.prevent="searchMyBook" class="d-flex">-->
 <!--        <input v-model="keyword" class="form-control me-sm-2" type="text" placeholder="Search" />-->
 <!--        <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>-->
 <!--      </form>-->
-
-
 
       <!-- 게시글 테이블 -->
       <div class="table-responsive">

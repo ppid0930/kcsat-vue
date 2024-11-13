@@ -3,14 +3,13 @@
     <div class="container">
       <div v-if="questions.length > 0">
         <!-- 인기 문제 리스트 출력 -->
-        <div v-for="(question, index) in questions" :key="question.QId">
-          <div>인기 문제 {{ index + 1 }}등!!</div>
-          <div>문제 ID: {{ question.QId }}</div>
-          <div>
-            <p @click="questionDetails(question.QId)">{{question.title}}</p>
+        <div v-for="(question, index) in questions" :key="question.qid">
+          <div class="font-nanum-gothic-extrabold">{{ index + 1 }}위 인기 문제</div>
+          <div class="font-roman-bold fake-link" @click="questionDetails(question.qid)">
+            {{question.title}}
           </div>
-          <div>문제 본문: {{ question.mainText }}</div>
-          <div>문제 공유 카운트: {{ question.shareCounter }}</div>
+          <div class="font-roman">{{ question.mainText }}</div>
+          <div class="font-nanum-gothic-regular">문제 공유 카운트: {{ question.shareCounter }}</div>
         </div>
       </div>
       <div v-else>
@@ -56,7 +55,7 @@ export default {
 
         // Pinia 스토어에 데이터 저장
         questionStorage.setQuestionData({
-          qId: response.data.qId,
+          qId: response.data.qid,
           questionType: response.data.questionType,
           title: response.data.title,
           mainText: response.data.mainText,
@@ -93,5 +92,12 @@ export default {
 </script>
 
 <style scoped>
-/* 스타일을 여기에 추가할 수 있습니다. */
+.fake-link {
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.fake-link:hover {
+  color: darkblue;
+}
 </style>

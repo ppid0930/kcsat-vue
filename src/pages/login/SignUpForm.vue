@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div class="container">
+    <div class="container font-nanum-gothic-regular">
       <form @submit.prevent="submitForm">
         <!-- 이메일 입력 -->
         <div class="form-group">
-          <label for="email" class="form-label mt-4">이메일 입력</label>
+          <label for="email" class="form-label mt-4 font-nanum-gothic-bold">이메일</label>
           <input
               type="text"
               v-model="email"
@@ -14,7 +14,7 @@
           />
 
           <!-- 닉네임 입력 -->
-          <label for="username" class="form-label mt-4">닉네임 입력</label>
+          <label for="username" class="form-label mt-4 font-nanum-gothic-bold">닉네임</label>
           <input
               type="text"
               v-model="username"
@@ -24,7 +24,7 @@
           />
 
           <!-- 비밀번호 입력 -->
-          <label for="password" class="form-label mt-4">비밀번호 입력</label>
+          <label for="password" class="form-label mt-4 font-nanum-gothic-bold">비밀번호</label>
           <input
               type="password"
               v-model="password"
@@ -35,7 +35,7 @@
         </div>
 
         <!-- 제출 버튼 -->
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary mt-2">회원 가입</button>
       </form>
       <br />
     </div>

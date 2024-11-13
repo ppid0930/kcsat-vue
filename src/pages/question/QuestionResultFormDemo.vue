@@ -14,13 +14,11 @@
           {{ choice }}
         </div>
 
-        <br>
-        <div class="font-nanum-myeongjo-extrabold">정답: {{ data?.answer }}</div>
+<!--        <br>-->
+<!--        <div class="font-nanum-myeongjo-extrabold">정답: {{ data?.answer }}</div>-->
       </div>
-
-
       <br>
-      <p><b style="color: red">로그인 하시면 외부 영어 지문으로 '수능 영어 문제 생성', '해석 및 해설 생성' 기능을 이용하실 수 있습니다.</b></p>
+      <p><span class="font-nanum-gothic-bold" style="color: red">로그인 하시면 외부 영어 지문으로 '수능 영어 문제 생성', '번역 및 해설 생성' 기능을 이용하실 수 있습니다.</span></p>
     </div>
     <div v-else>
       <p>No data available</p>
@@ -35,7 +33,6 @@ export default {
   setup() {
     const questionStorage = useQuestionStorage();
     const data = questionStorage.getQuestionData;
-    questionStorage.clearQuestionData();
 
     const questionTypes = new Map([
       ['PURPOSE', '글의 목적'],

@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div class="container">
+    <div class="container font-nanum-gothic-regular">
 
-      <h6 class="font-nanum-gothic-regular"><span class="font-nanum-gothic-bold">{{ questionTypes.get(data?.questionType) }}</span> 문제 생성 완료</h6>
+      <h6><span class="font-nanum-gothic-bold">{{ questionTypes.get(data?.questionType) }}</span> 해설 생성 완료</h6>
       <br>
 
       <div class="font-roman">
@@ -20,10 +20,9 @@
       <!-- 정답 및 해설 표시 -->
       <div class="form-group">
         <p class="text-xl-left font-nanum-myeongjo-extrabold">정답 : {{ data.answer }}</p>
-        <p class="text-md-left font-nanum-gothic-regular"><span class="font-nanum-myeongjo-extrabold">해석 : </span>{{ data.translation }}</p>
-        <p class="text-md-left font-nanum-gothic-regular"><span class="font-nanum-myeongjo-extrabold">해설 : </span>{{ data.explanation }}</p>
+        <p class="text-md-left"><span class="font-nanum-myeongjo-extrabold">번역 : </span>{{ data.translation }}</p>
+        <p class="text-md-left"><span class="font-nanum-myeongjo-extrabold">해설 : </span>{{ data.explanation }}</p>
       </div>
-
 
       <br>
 
@@ -46,9 +45,6 @@
           </button>
         </a>
       </div>
-
-
-
 
     </div> <!-- /container -->
   </div>
@@ -99,8 +95,6 @@ export default {
           translation: data.translation,
           explanation: data.explanation,
         };
-
-        console.log(payload);
 
         console.log("Loading...")
         await api.post(url, payload);

@@ -1,8 +1,6 @@
 <template>
   <div>
-    <div class="container">
-
-
+    <div class="container font-nanum-gothic-regular">
       <!-- 게시글 테이블 -->
       <div class="table-responsive">
         <table class="table table-striped table-hover custom-table">
@@ -29,7 +27,6 @@
         </table>
       </div>
 
-
       <div class="d-flex justify-content-center">
         <!-- 페이지네이션 -->
         <div v-if="totalPages">
@@ -52,7 +49,6 @@
           </ul>
         </div>
       </div>
-
 
       <!-- 문제 유형 선택 및 검색 폼 -->
       <form @submit.prevent="searchBoard" class="d-flex justify-content-center align-items-center">
@@ -80,7 +76,6 @@
 
       <!-- 글 쓰기 버튼 -->
       <router-link to="/board/post/new" class="btn btn-primary">글 쓰기</router-link>
-
       <br>
     </div>
   </div>
@@ -224,7 +219,6 @@ export default {
     onMounted(() => {
       postList();
     });
-
 
     return {
       posts,
