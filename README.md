@@ -1,29 +1,7 @@
-# kcsat-vue
+# KCSAT Vue 프론트엔드 서버
 
-This template should help get you started developing with Vue 3 in Vite.
-
-## Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
+# 핵심 구현 기능
+1. API 로드 및 화면 출력
+2. JWT 토큰 읽어서 사용자 정보 출력
+3. Pinia 라이브러리를 사용하여 API 데이터 저장 후 다른 컴포넌트에서도 재사용
+4. 로그인 필요한 URL은 필터링
