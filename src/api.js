@@ -3,12 +3,11 @@ import router from '@/router';
 
 // Axios 인스턴스를 생성 (필요에 따라 baseURL 설정)
 const api = axios.create({
-    baseURL: 'http://www.csatmaker.site/api',  // 백엔드 API URL
+    baseURL: 'https://www.csatmaker.site/api',  // 백엔드 API URL
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
     },
-
 });
 
 // Axios 인터셉터 설정
