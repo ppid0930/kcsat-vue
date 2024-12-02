@@ -1,6 +1,6 @@
 # 1단계: Node 이미지로 Vue 프로젝트 빌드
 FROM node:lts-alpine AS build
-#
+
 WORKDIR /app
 
 # package.json과 package-lock.json 복사
